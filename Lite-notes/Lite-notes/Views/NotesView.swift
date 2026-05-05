@@ -13,29 +13,27 @@ struct NotesView: View {
     @State private var showBatchDeleteConfirm = false
     
     var body: some View {
-        NavigationStack {
-            List {
-                ForEach(notes) { note in
+        List {
+            ForEach(notes) { note in
+                HStack {
+                    if !selectedNotes.isEmpty {
+                        Image(systemName: selectedNotes.contains(note.id) ? "checkmark.circle.fill" : "circle")
+                            .foregroundColor(selectedNotes.contains(note.id) ? .accentColor : .secondary)
+                            .padding(.trailing, 8)
+                            .onTapGesture {
+                                toggleSelection(note.id)
+                            }
+                    }
+                    
                     Button {
                         if selectedNotes.isEmpty {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                selectedNote = note
-                            }
+                            selectedNote = note
                         } else {
                             toggleSelection(note.id)
                         }
                     } label: {
-                        HStack {
-                            if !selectedNotes.isEmpty {
-                                Image(systemName: selectedNotes.contains(note.id) ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(selectedNotes.contains(note.id) ? .accentColor : .secondary)
-                                    .padding(.trailing, 8)
-                            }
-                            noteRowView(for: note)
-                        }
+                        NoteRowView(note: note, isSelected: selectedNote?.id == note.id)
                     }
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(.init(top: 4, leading: 8, bottom: 4, trailing: 8))
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) {
                             noteToDelete = note
@@ -43,7 +41,6 @@ struct NotesView: View {
                         } label: {
                             Label("删除", systemImage: "trash")
                         }
-                        .tint(.red)
                     }
                     .contextMenu {
                         Button(role: .destructive) {
@@ -54,84 +51,81 @@ struct NotesView: View {
                         }
                     }
                 }
+                .listRowBackground(Color.clear)
+                .listRowInsets(.init(top: 4, leading: 8, bottom: 4, trailing: 8))
             }
-            .listStyle(.plain)
-            .navigationTitle("笔记")
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.large)
-            #endif
-            .toolbar {
-                if !selectedNotes.isEmpty {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("取消") {
-                            selectedNotes.removeAll()
-                        }
-                    }
-                    ToolbarItem(placement: .primaryAction) {
-                        Button(role: .destructive) {
-                            showBatchDeleteConfirm = true
-                        } label: {
-                            Label("删除 \(selectedNotes.count)", systemImage: "trash")
-                        }
-                    }
-                } else {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            createNewNote()
-                        } label: {
-                            Label("新建笔记", systemImage: "plus")
-                        }
-                    }
-                    
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            isCreatingFromTemplate = true
-                        } label: {
-                            Label("从模板创建", systemImage: "square.text.square")
-                        }
-                    }
-                    
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            enterSelectionMode()
-                        } label: {
-                            Label("选择", systemImage: "checkmark.circle")
-                        }
+        }
+        .listStyle(.plain)
+        .navigationTitle("笔记")
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.large)
+        #endif
+        .toolbar {
+            if !selectedNotes.isEmpty {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("取消") {
+                        selectedNotes.removeAll()
                     }
                 }
-            }
-            .overlay {
-                if notes.isEmpty {
-                    EmptyNotesView()
+                ToolbarItem(placement: .primaryAction) {
+                    Button(role: .destructive) {
+                        showBatchDeleteConfirm = true
+                    } label: {
+                        Label("删除 \(selectedNotes.count)", systemImage: "trash")
+                    }
+                }
+            } else {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        createNewNote()
+                    } label: {
+                        Label("新建笔记", systemImage: "plus")
+                    }
+                }
+                
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        isCreatingFromTemplate = true
+                    } label: {
+                        Label("从模板创建", systemImage: "square.text.square")
+                    }
+                }
+                
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        enterSelectionMode()
+                    } label: {
+                        Label("选择", systemImage: "checkmark.circle")
+                    }
                 }
             }
-            .alert("确认删除", isPresented: $showDeleteConfirm, presenting: noteToDelete) { note in
-                Button("取消", role: .cancel) {
-                    noteToDelete = nil
-                }
-                Button("删除", role: .destructive) {
-                    deleteNote(note)
-                    noteToDelete = nil
-                }
-            } message: { note in
-                Text("确定要删除笔记 \"\(note.title.isEmpty ? "无标题" : note.title)\" 吗？")
+        }
+        .overlay {
+            if notes.isEmpty {
+                EmptyNotesView()
             }
-            .alert("确认批量删除", isPresented: $showBatchDeleteConfirm) {
-                Button("取消", role: .cancel) {
-                    showBatchDeleteConfirm = false
-                }
-                Button("删除", role: .destructive) {
-                    deleteSelectedNotes()
-                    showBatchDeleteConfirm = false
-                }
-            } message: {
-                Text("确定要删除选中的 \(selectedNotes.count) 条笔记吗？")
+        }
+        .alert("确认删除", isPresented: $showDeleteConfirm, presenting: noteToDelete) { note in
+            Button("取消", role: .cancel) {
+                noteToDelete = nil
             }
-            .onTapGesture {
-                if !selectedNotes.isEmpty {
-                    selectedNotes.removeAll()
-                }
+            Button("删除", role: .destructive) {
+                deleteNote(note)
+                noteToDelete = nil
             }
+        } message: { note in
+            Text("确定要删除笔记 \"\(note.title.isEmpty ? "无标题" : note.title)\" 吗？")
+        }
+        .alert("确认批量删除", isPresented: $showBatchDeleteConfirm) {
+            Button("取消", role: .cancel) {
+                showBatchDeleteConfirm = false
+            }
+            Button("删除", role: .destructive) {
+                deleteSelectedNotes()
+                showBatchDeleteConfirm = false
+            }
+        } message: {
+            Text("确定要删除选中的 \(selectedNotes.count) 条笔记吗？")
         }
     }
     
@@ -141,11 +135,6 @@ struct NotesView: View {
         } else {
             selectedNotes.insert(id)
         }
-    }
-    
-    @ViewBuilder
-    private func noteRowView(for note: Note) -> some View {
-        NoteRowView(note: note, isSelected: selectedNote?.id == note.id)
     }
     
     private func enterSelectionMode() {
@@ -229,10 +218,6 @@ struct NoteRowView: View {
             }
         }
         #endif
-        .transition(.asymmetric(
-            insertion: .scale(scale: 0.9).combined(with: .opacity),
-            removal: .scale(scale: 0.9).combined(with: .opacity)
-        ))
     }
 }
 

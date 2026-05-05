@@ -12,6 +12,10 @@
 		<data>
 		eUA/igD5aQa/6UauwV3JXRiOkrI=
 		</data>
+		<key>Resources/readme.txt</key>
+		<data>
+		WqKWwIePT9C1oKIZ6rUYMpJHNn8=
+		</data>
 	</dict>
 	<key>files2</key>
 	<dict>
@@ -19,7 +23,7 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			UaEU2BM3jVkRwqDwth04p7+SPyY=
+			Nel3aPE9vrjXFbKkWtEuCzzHoVg=
 			</data>
 			<key>requirement</key>
 			<string>identifier "Lite-notes.debug" and anchor apple generic and certificate leaf[subject.CN] = "Apple Development: cangcang2025@petalmail.com (LD9M6T6GRP)" and certificate 1[field.1.2.840.113635.100.6.2.1] /* exists */</string>
@@ -45,6 +49,13 @@
 			<key>hash2</key>
 			<data>
 			sg/9MhfczuIpuHzycz+vCQ4zVMtY7q/dQs7qkmitvEo=
+			</data>
+		</dict>
+		<key>Resources/readme.txt</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			OpFkDrK7UoWeflvZ3k+OOovKPr+hkcSnoVGeUTY4sE8=
 			</data>
 		</dict>
 	</dict>

@@ -15,9 +15,18 @@ struct TemplatesView: View {
     @State private var showBatchDeleteConfirm = false
     
     var body: some View {
-        NavigationStack {
-            List {
-                ForEach(templates) { template in
+        List {
+            ForEach(templates) { template in
+                HStack {
+                    if !selectedTemplates.isEmpty {
+                        Image(systemName: selectedTemplates.contains(template.id) ? "checkmark.circle.fill" : "circle")
+                            .foregroundColor(selectedTemplates.contains(template.id) ? .accentColor : .secondary)
+                            .padding(.trailing, 8)
+                            .onTapGesture {
+                                toggleSelection(template.id)
+                            }
+                    }
+                    
                     Button {
                         if selectedTemplates.isEmpty {
                             showTemplateDetail = template
@@ -25,17 +34,8 @@ struct TemplatesView: View {
                             toggleSelection(template.id)
                         }
                     } label: {
-                        HStack {
-                            if !selectedTemplates.isEmpty {
-                                Image(systemName: selectedTemplates.contains(template.id) ? "checkmark.circle.fill" : "circle")
-                                    .foregroundColor(selectedTemplates.contains(template.id) ? .accentColor : .secondary)
-                                    .padding(.trailing, 8)
-                            }
-                            templateRowView(for: template)
-                        }
+                        TemplateRowView(template: template, isSelected: selectedTemplate?.id == template.id)
                     }
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(.init(top: 4, leading: 8, bottom: 4, trailing: 8))
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) {
                             templateToDelete = template
@@ -43,7 +43,6 @@ struct TemplatesView: View {
                         } label: {
                             Label("删除", systemImage: "trash")
                         }
-                        .tint(.red)
                     }
                     .contextMenu {
                         Button(role: .destructive) {
@@ -54,83 +53,80 @@ struct TemplatesView: View {
                         }
                     }
                 }
+                .listRowBackground(Color.clear)
+                .listRowInsets(.init(top: 4, leading: 8, bottom: 4, trailing: 8))
             }
-            .listStyle(.plain)
-            .navigationTitle("模板")
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.large)
-            #endif
-            .toolbar {
-                if !selectedTemplates.isEmpty {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("取消") {
-                            selectedTemplates.removeAll()
-                        }
-                    }
-                    ToolbarItem(placement: .primaryAction) {
-                        Button(role: .destructive) {
-                            showBatchDeleteConfirm = true
-                        } label: {
-                            Label("删除 \(selectedTemplates.count)", systemImage: "trash")
-                        }
-                    }
-                } else {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            showCreatorView = true
-                        } label: {
-                            Label("新建", systemImage: "plus")
-                        }
-                    }
-                    
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            enterSelectionMode()
-                        } label: {
-                            Label("选择", systemImage: "checkmark.circle")
-                        }
+        }
+        .listStyle(.plain)
+        .navigationTitle("模板")
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.large)
+        #endif
+        .toolbar {
+            if !selectedTemplates.isEmpty {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("取消") {
+                        selectedTemplates.removeAll()
                     }
                 }
-            }
-            .overlay {
-                if templates.isEmpty {
-                    EmptyTemplatesView()
+                ToolbarItem(placement: .primaryAction) {
+                    Button(role: .destructive) {
+                        showBatchDeleteConfirm = true
+                    } label: {
+                        Label("删除 \(selectedTemplates.count)", systemImage: "trash")
+                    }
+                }
+            } else {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        showCreatorView = true
+                    } label: {
+                        Label("新建", systemImage: "plus")
+                    }
+                }
+                
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        enterSelectionMode()
+                    } label: {
+                        Label("选择", systemImage: "checkmark.circle")
+                    }
                 }
             }
-            .sheet(isPresented: $showCreatorView) {
-                TemplateCreatorView()
+        }
+        .overlay {
+            if templates.isEmpty {
+                EmptyTemplatesView()
             }
-            .sheet(item: $showTemplateDetail) { template in
-                TemplateDetailView(template: template, isCreatingFromTemplate: $isCreatingFromTemplate)
-                    .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showCreatorView) {
+            TemplateCreatorView()
+        }
+        .sheet(item: $showTemplateDetail) { template in
+            TemplateDetailView(template: template, isCreatingFromTemplate: $isCreatingFromTemplate)
+                .presentationDetents([.medium, .large])
+        }
+        .alert("确认删除", isPresented: $showDeleteConfirm, presenting: templateToDelete) { template in
+            Button("取消", role: .cancel) {
+                templateToDelete = nil
             }
-            .alert("确认删除", isPresented: $showDeleteConfirm, presenting: templateToDelete) { template in
-                Button("取消", role: .cancel) {
-                    templateToDelete = nil
-                }
-                Button("删除", role: .destructive) {
-                    deleteTemplate(template)
-                    templateToDelete = nil
-                }
-            } message: { template in
-                Text("确定要删除模板 \"\(template.name.isEmpty ? "未命名模板" : template.name)\" 吗？")
+            Button("删除", role: .destructive) {
+                deleteTemplate(template)
+                templateToDelete = nil
             }
-            .alert("确认批量删除", isPresented: $showBatchDeleteConfirm) {
-                Button("取消", role: .cancel) {
-                    showBatchDeleteConfirm = false
-                }
-                Button("删除", role: .destructive) {
-                    deleteSelectedTemplates()
-                    showBatchDeleteConfirm = false
-                }
-            } message: {
-                Text("确定要删除选中的 \(selectedTemplates.count) 个模板吗？")
+        } message: { template in
+            Text("确定要删除模板 \"\(template.name.isEmpty ? "未命名模板" : template.name)\" 吗？")
+        }
+        .alert("确认批量删除", isPresented: $showBatchDeleteConfirm) {
+            Button("取消", role: .cancel) {
+                showBatchDeleteConfirm = false
             }
-            .onTapGesture {
-                if !selectedTemplates.isEmpty {
-                    selectedTemplates.removeAll()
-                }
+            Button("删除", role: .destructive) {
+                deleteSelectedTemplates()
+                showBatchDeleteConfirm = false
             }
+        } message: {
+            Text("确定要删除选中的 \(selectedTemplates.count) 个模板吗？")
         }
     }
     
@@ -142,22 +138,11 @@ struct TemplatesView: View {
         }
     }
     
-    @ViewBuilder
-    private func templateRowView(for template: Template) -> some View {
-        TemplateRowView(template: template, isSelected: selectedTemplate?.id == template.id)
-    }
-    
     private func enterSelectionMode() {
         selectedTemplates = Set()
         if let firstTemplate = templates.first {
             selectedTemplates.insert(firstTemplate.id)
         }
-    }
-    
-    private func createNewTemplate() {
-        let template = Template()
-        modelContext.insert(template)
-        selectedTemplate = template
     }
     
     private func deleteTemplate(_ template: Template) {
@@ -225,10 +210,6 @@ struct TemplateRowView: View {
             }
         }
         #endif
-        .transition(.asymmetric(
-            insertion: .scale(scale: 0.9).combined(with: .opacity),
-            removal: .scale(scale: 0.9).combined(with: .opacity)
-        ))
     }
 }
 
