@@ -1,0 +1,59 @@
+{
+  "fill" : {
+    "automatic-gradient" : "extended-gray:1.00000,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "image-name" : "Polygon 1-2.png",
+          "name" : "Polygon 1-2",
+          "position" : {
+            "scale" : 2,
+            "translation-in-points" : [
+              -232.265625,
+              135.6328125
+            ]
+          }
+        },
+        {
+          "image-name" : "Mask group-2.png",
+          "name" : "Mask group-2",
+          "position" : {
+            "scale" : 3,
+            "translation-in-points" : [
+              0,
+              243
+            ]
+          }
+        },
+        {
+          "image-name" : "Mask group.png",
+          "name" : "Mask group",
+          "opacity" : 1,
+          "position" : {
+            "scale" : 3,
+            "translation-in-points" : [
+              10.734375,
+              -107.3671875
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
