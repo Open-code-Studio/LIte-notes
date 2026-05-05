@@ -1,0 +1,53 @@
+{
+  "diskImage" : {
+    "autoopen" : true,
+    "background" : {
+      "layoutObjects" : [
+
+      ],
+      "type" : 3
+    },
+    "format" : "APFS",
+    "iconPreviewVisible" : false,
+    "iconSize" : 48,
+    "itemInfoVisible" : false,
+    "labelPosition" : 0,
+    "licenses" : [
+
+    ],
+    "nameFontSize" : 12,
+    "statusBarVisible" : false,
+    "suggestedDiskImageName" : "Lite-notes.dmg",
+    "toolbarVisible" : false,
+    "uid" : "fxcisjazir",
+    "validationScheme" : 0,
+    "viewLayout" : 0,
+    "volumeIcon" : "volumeIcon",
+    "volumeName" : "Lite-notes",
+    "volumeSize" : 0,
+    "volumeSizeOption" : "Automatic",
+    "windowContentHeight" : 360,
+    "windowContents" : [
+      {
+        "filePath" : "\/Users\/cangcang\/Documents\/开发\/Lite-notes\/pull-lite-note\/LIte-notes\/Lite-notes.app",
+        "iconSize" : 100,
+        "invisible" : false,
+        "isAnAlias" : false,
+        "location" : "{181, 180}",
+        "relativeFilePath" : "LIte-notes\/Lite-notes.app"
+      },
+      {
+        "filePath" : "\/Applications",
+        "iconSize" : 100,
+        "invisible" : false,
+        "isAnAlias" : true,
+        "location" : "{427, 180}",
+        "relativeFilePath" : "..\/..\/..\/..\/..\/..\/Applications"
+      }
+    ],
+    "windowContentWidth" : 600,
+    "windowLeft" : 200,
+    "windowTop" : 120
+  },
+  "version" : 4
+}
